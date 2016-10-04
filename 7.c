@@ -5,12 +5,13 @@
 
 #include <stdio.h>
 
-extern char mem[];
+extern char rom[];
+char ram[0x40];
 unsigned int pc;
 char opcode;
-char reg[8];
+char sp;
 
-const char VER[]="$ver: go7000 0.2 ("__DATE__") $";
+const char VER[]="$ver: go7000 0.3 ("__DATE__") $";
 
 void decode()
 {
@@ -25,7 +26,7 @@ switch(opcode)
 	case '\xA4':
 	case '\xC4':
 	case '\xE4':
-	pc=((opcode&0xf0)<<3)+mem[pc+1];
+	pc=((opcode&0xf0)<<3)+rom[pc+1];
 	break;
 
 	/* mov */
@@ -37,7 +38,22 @@ switch(opcode)
 	case '\xBD':
 	case '\xBE':
 	case '\xBF':
+	ram[(opcode&0x0f)>>3]=rom[pc+1];
+//printf("%x\n", (opcode&0x0f)>>4);
 	pc+=2;
+	break;
+
+	/* call */
+	case '\x14':
+	case '\x34':
+	case '\x54':
+	case '\x74':
+	case '\x94':
+	case '\xB4':
+	case '\xD4':
+	case '\xF4':
+	pc=((opcode&0xf0)<<3)+rom[pc+1];
+	++sp;
 	break;
 
 	/* sel */
@@ -51,19 +67,19 @@ switch(opcode)
 
 void main()
 {
-opcode=mem[pc];
+opcode=rom[pc];
 printf("%x %x\n", opcode, pc);
 decode();
-opcode=mem[pc];
+opcode=rom[pc];
 printf("%x %x\n", opcode, pc);
 decode();
-opcode=mem[pc];
+opcode=rom[pc];
 printf("%x %x\n", opcode, pc);
 decode();
-opcode=mem[pc];
+opcode=rom[pc];
 printf("%x %x\n", opcode, pc);
 decode();
-opcode=mem[pc];
+opcode=rom[pc];
 printf("%x %x\n", opcode, pc);
 decode();
 }
