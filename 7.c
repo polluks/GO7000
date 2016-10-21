@@ -13,7 +13,7 @@ char opcode;
 char sp=0x08;
 char a;
 
-const char VER[]="$ver: go7000 0.4 ("__DATE__") $";
+const char VER[]="$ver: go7000 0.5 ("__DATE__") $";
 
 void decode()
 {
@@ -32,6 +32,38 @@ switch(opcode)
 	break;
 
 	/* mov */
+	case 0x23:
+	a=rom[pc+1];
+	pc+=2;
+	break;
+
+	/* clr */
+	case 0x27:
+	a=0;
+	++pc;
+	break;
+
+	/* mov */
+	case 0xA0:
+	case 0xA1:
+	iram[iram[(opcode&0x0f)>>3]]=a;
+	++pc;
+	break;
+
+	/* mov */
+	case 0xA8:
+	case 0xA9:
+	case 0xAA:
+	case 0xAB:
+	case 0xAC:
+	case 0xAD:
+	case 0xAE:
+	case 0xAF:
+	iram[(opcode&0x0f)>>3]=a;
+	++pc;
+	break;
+
+	/* mov */
 	case 0xB8:
 	case 0xB9:
 	case 0xBA:
@@ -43,6 +75,19 @@ switch(opcode)
 	iram[(opcode&0x0f)>>3]=rom[pc+1];
 //printf("%x\n", (opcode&0x0f)>>4);
 	pc+=2;
+	break;
+
+	/* mov */
+	case 0xF8:
+	case 0xF9:
+	case 0xFA:
+	case 0xFB:
+	case 0xFC:
+	case 0xFD:
+	case 0xFE:
+	case 0xFF:
+	a=iram[(opcode&0x0f)>>3];
+	++pc;
 	break;
 
 	/* movx */
@@ -64,6 +109,7 @@ switch(opcode)
 	case 0xD4:
 	case 0xF4:
 	iram[sp++]=pc;
+	iram[sp++]=pc>>8;
 	pc=((opcode&0xf0)>>5)+rom[pc+1];
 	break;
 
@@ -95,9 +141,24 @@ switch(opcode)
 	pc=a ? rom[pc+1] : pc+2;
 	break;
 
+	/* orl */
+	case 0x88:
+	case 0x89:
+	case 0x8A:
+	case 0x8B:
+//
+	pc+=2;
+	break;
+
+	/* anl */
+	case 0x99:
+//
+	pc+=2;
+	break;
+
 	/* ret */
 	case 0x83:
-	pc=iram[sp--];
+	pc=(iram[--sp]<<8)+iram[--sp];
 	break;
 	
 	/* sel */
@@ -115,10 +176,10 @@ switch(opcode)
 void main()
 {
 short i;
-for (i=0; i<10; ++i)
+for (i=0; i<30; ++i)
 	{
 	opcode=rom[pc];
-	printf("%x %3x\n", opcode, pc);
+	printf("%x %3x %d\n", opcode, pc, sp);
 	decode();
 	}
 }
