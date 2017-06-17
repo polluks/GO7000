@@ -1,10 +1,12 @@
 /* $Id$
  * GO7000 Simulator
- * Dedicated to Stefan Egger
+ * Dedicated to Doris
+ * Credits to Stefan Egger
  */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "gpu.h"
 
 extern char rom[];
 char iram[0x40];
@@ -12,8 +14,9 @@ unsigned short pc;
 char opcode;
 char sp=0x08;
 char a;
+char i;
 
-const char VER[]="$ver: go7000 0.5 ("__DATE__") $";
+const char VER[]="$ver: go7000 0.6 ("__DATE__") $";
 
 void decode()
 {
@@ -108,9 +111,9 @@ switch(opcode)
 	case 0xB4:
 	case 0xD4:
 	case 0xF4:
-	iram[sp++]=pc;
-	iram[sp++]=pc>>8;
-	pc=((opcode&0xf0)>>5)+rom[pc+1];
+	iram[sp++]=pc+2;
+	iram[sp++]=pc+2>>8;
+	pc=((opcode&0x60)<<3)+rom[pc+1];
 	break;
 
 	/* inc */
@@ -126,6 +129,19 @@ switch(opcode)
 	++pc;
 	break;
 
+	/* dec */
+	case 0xC8:
+	case 0xC9:
+	case 0xCA:
+	case 0xCB:
+	case 0xCC:
+	case 0xCD:
+	case 0xCE:
+	case 0xCF:
+	--iram[(opcode&0x0f)>>3];
+	++pc;
+	break;
+
 	/* djnz */
 	case 0xE8:
 	case 0xE9:
@@ -138,7 +154,7 @@ switch(opcode)
 	--iram[(opcode&0x0f)>>3];
 	/* jnz */
 	case 0x96:
-	pc=a ? rom[pc+1] : pc+2;
+	pc=a ? pc&0xff+rom[pc+1] : pc+2;
 	break;
 
 	/* orl */
@@ -151,6 +167,7 @@ switch(opcode)
 	break;
 
 	/* anl */
+	case 0x53:
 	case 0x99:
 //
 	pc+=2;
@@ -162,9 +179,22 @@ switch(opcode)
 	break;
 	
 	/* sel */
+	case 0xC5:
 	case 0xD5:
 	/* nop */
 	case 0x00:
+	++pc;
+	break;
+
+	/* dis */
+	case 0x15:
+	i=0;
+	++pc;
+	break;
+
+	/* en */
+	case 0x05:
+	i=1;
 	++pc;
 	break;
 	
@@ -176,7 +206,9 @@ switch(opcode)
 void main()
 {
 short i;
-for (i=0; i<30; ++i)
+
+double_width();
+for (i=0; i<50; ++i)
 	{
 	opcode=rom[pc];
 	printf("%x %3x %d\n", opcode, pc, sp);

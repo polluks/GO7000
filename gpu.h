@@ -1,0 +1,1 @@
+void double_width();
