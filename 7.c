@@ -10,6 +10,7 @@
 
 extern char rom[];
 char iram[0x40];
+char xram[0x80];
 unsigned short pc;
 char opcode;
 char sp=0x08;
@@ -34,6 +35,18 @@ switch(opcode)
 	pc=((opcode&0xf0)<<3)+rom[pc+1];
 	break;
 
+	/* jbn */
+	case 0x12:
+	case 0x32:
+	case 0x52:
+	case 0x72:
+	case 0x92:
+	case 0xB2:
+	case 0xD2:
+	case 0xF2:
+	pc=a&opcode>>4 ? (pc&00)+rom[pc+1] : pc+1;
+	break;
+
 	/* mov */
 	case 0x23:
 	a=rom[pc+1];
@@ -49,7 +62,13 @@ switch(opcode)
 	/* mov */
 	case 0xA0:
 	case 0xA1:
-	iram[iram[(opcode&0x0f)>>3]]=a;
+	iram[iram[opcode&0x01]]=a;
+	++pc;
+	break;
+
+	/* movp */
+	case 0xA3:
+	a=rom[pc&0x00|a];
 	++pc;
 	break;
 
@@ -62,7 +81,7 @@ switch(opcode)
 	case 0xAD:
 	case 0xAE:
 	case 0xAF:
-	iram[(opcode&0x0f)>>3]=a;
+	iram[opcode&0x07]=a;
 	++pc;
 	break;
 
@@ -75,8 +94,7 @@ switch(opcode)
 	case 0xBD:
 	case 0xBE:
 	case 0xBF:
-	iram[(opcode&0x0f)>>3]=rom[pc+1];
-//printf("%x\n", (opcode&0x0f)>>4);
+	iram[opcode&0x07]=rom[pc+1];
 	pc+=2;
 	break;
 
@@ -89,16 +107,21 @@ switch(opcode)
 	case 0xFD:
 	case 0xFE:
 	case 0xFF:
-	a=iram[(opcode&0x0f)>>3];
+	a=iram[opcode&0x07];
 	++pc;
 	break;
 
 	/* movx */
 	case 0x80:
 	case 0x81:
+	a=xram[opcode&1];
+	++pc;
+	break;
+
+	/* movx */
 	case 0x90:
 	case 0x91:
-//	iram[(opcode&0x0f)>>3]=rom[pc+1];
+	xram[opcode&1]=a;
 	++pc;
 	break;
 
@@ -125,7 +148,7 @@ switch(opcode)
 	case 0x1D:
 	case 0x1E:
 	case 0x1F:
-	++iram[(opcode&0x0f)>>3];
+	++iram[opcode&0x07];
 	++pc;
 	break;
 
@@ -138,7 +161,7 @@ switch(opcode)
 	case 0xCD:
 	case 0xCE:
 	case 0xCF:
-	--iram[(opcode&0x0f)>>3];
+	--iram[opcode&0x07];
 	++pc;
 	break;
 
@@ -151,13 +174,21 @@ switch(opcode)
 	case 0xED:
 	case 0xEE:
 	case 0xEF:
-	--iram[(opcode&0x0f)>>3];
+	--iram[opcode&0x07];
+	pc=iram[opcode&0x07] ? (pc&0xff00)+rom[pc+1] : pc+2;
+//printf("%x %x\n", iram[0], iram[1]);
+	break;
+
 	/* jnz */
 	case 0x96:
-	pc=a ? pc&0xff+rom[pc+1] : pc+2;
+	pc=a ? (pc&0xff00)+rom[pc+1] : pc+2;
 	break;
 
 	/* orl */
+	case 0x43:
+	a|=rom[pc+1];
+	pc+=2;
+	break;
 	case 0x88:
 	case 0x89:
 	case 0x8A:
@@ -208,7 +239,7 @@ void main()
 short i;
 
 double_width();
-for (i=0; i<50; ++i)
+for (i=0; i<1500; ++i)
 	{
 	opcode=rom[pc];
 	printf("%x %3x %d\n", opcode, pc, sp);

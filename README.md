@@ -1,2 +1,2 @@
 # GO7000 Simulator
-Dedicated to Stefan Egger
+Dedicated to Doris
