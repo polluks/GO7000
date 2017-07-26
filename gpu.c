@@ -1,5 +1,5 @@
 /*
- *   i8245 character table
+ *   i8244 character table
  */
 
 char cset[512]= {
