@@ -1,3 +1,4 @@
 # GO7000 Simulator
 Dedicated to Doris
-Requires BIOS image
+
+Requires a BIOS image

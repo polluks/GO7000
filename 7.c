@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gpu.h"
+#define XORSWAP_UNSAFE(a, b)    ((a)^=(b),(b)^=(a),(a)^=(b))
 
 extern char rom[];
 char iram[0x40];
@@ -16,7 +17,11 @@ char opcode;
 char sp=0x08;
 char a;
 char c;
+char ac;
+char f0;
+char f1;
 char i;
+char t;
 char p[2];
 
 const char VER[]="$\x56\x45\x52: go7000 0.7 ("__DATE__") $";
@@ -73,6 +78,16 @@ switch(opcode)
 	pc=c ? (pc&0xff00)+rom[pc+1] : pc+1;
 	break;
 
+	/* jf0 */
+	case 0xB6:
+	pc=f0 ? (pc&0xff00)+rom[pc+1] : pc+1;
+	break;
+
+	/* jf1 */
+	case 0x76:
+	pc=f1 ? (pc&0xff00)+rom[pc+1] : pc+1;
+	break;
+
 	/* mov */
 	case 0x23:
 	a=rom[pc+1];
@@ -88,6 +103,18 @@ switch(opcode)
 	/* clr */
 	case 0x97:
 	c=0;
+	++pc;
+	break;
+
+	/* clr */
+	case 0x85:
+	f0=0;
+	++pc;
+	break;
+
+	/* clr */
+	case 0xA5:
+	f1=0;
 	++pc;
 	break;
 
@@ -134,6 +161,13 @@ switch(opcode)
 	case 0xBF:
 	iram[opcode&0x07]=rom[pc+1];
 	pc+=2;
+	break;
+
+	/* mov */
+	case 0xF0:
+	case 0xF1:
+	a=xram[iram[opcode&0x07]];
+	++pc;
 	break;
 
 	/* mov */
@@ -315,6 +349,12 @@ switch(opcode)
 	++pc;
 	break;
 	
+	/* ent0 */
+	case 0x75:
+	t=1;
+	++pc;
+	break;
+	
 	/* xch */
 	case 0x28:
 	case 0x29:
@@ -324,7 +364,7 @@ switch(opcode)
 	case 0x2D:
 	case 0x2E:
 	case 0x2F:
-	a=iram[opcode&0x07];// TODO
+	XORSWAP_UNSAFE(a, iram[opcode&0x07]);
 	++pc;
 	break;
 
@@ -333,12 +373,14 @@ switch(opcode)
 	}
 }
 
-void main()
+void main(int argc, char *argv[])
 {
-short i;
+short i, max=1500;
 
+if (argc==2)
+	max=atoi(argv[1]);
 double_width();
-for (i=0; i<1500; ++i)
+for (i=0; i<max; ++i)
 	{
 	opcode=rom[pc];
 	printf("%2x %3x %2d r0=%x r1=%x\n", opcode, pc, sp, iram[0], iram[1]);

@@ -10,4 +10,4 @@ gpu.o: gpu.c gpu.h
 
 
 run: 7
-	$(SIM) $?
+	$(SIM) -c $? $M
