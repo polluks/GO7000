@@ -12,3 +12,6 @@ gpu.o: gpu.c gpu.h
 
 run: 7
 	$(SIM) -c $? $M
+
+dist:
+	tar czf GO7000.tgz *
