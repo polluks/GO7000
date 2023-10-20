@@ -391,6 +391,19 @@ switch(opcode)
 		break;
 
 	/* xrl */
+	case 0xD0:
+	case 0xD1:
+		a^=iram[opcode&0x01];
+		++pc;
+		break;
+
+	/* xrl */
+	case 0xD3:
+		a^=rom[pc+1];
+		pc+=2;
+		break;
+
+	/* xrl */
 	case 0xD8:
 	case 0xD9:
 	case 0xDA:
@@ -399,8 +412,8 @@ switch(opcode)
 	case 0xDD:
 	case 0xDE:
 	case 0xDF:
-		a^=rom[pc+1];
-		pc+=2;
+		a^=iram[opcode&0x07];
+		++pc;
 		break;
 
 	default:
