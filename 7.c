@@ -51,6 +51,25 @@ switch(opcode)
 		pc+=2;
 		break;
 
+	/* outl bus,a */
+	case 0x02:
+		p[0]=a;
+		++pc;
+		break;
+
+	/* ins a,bus */
+	case 0x08:
+		a=p[0];
+		++pc;
+		break;
+
+	/* ins a,p */
+	case 0x09:
+	case 0x0A:
+		a=p[opcode&0x03];
+		++pc;
+		break;
+
 	/* jmp */
 	case 0x04:
 	case 0x24:
@@ -123,6 +142,24 @@ switch(opcode)
 	/* cpl */
 	case 0x37:
 		a=~a;
+		++pc;
+		break;
+
+	/* cpl c */
+	case 0xA7:
+		c=!c;
+		++pc;
+		break;
+
+	/* cpl f0 */
+	case 0x95:
+		f0=!f0;
+		++pc;
+		break;
+
+	/* cpl f1 */
+	case 0xB5:
+		f1=!f1;
 		++pc;
 		break;
 
@@ -213,13 +250,6 @@ switch(opcode)
 		pc=((opcode&0x60)<<3)+rom[pc+1];
 		break;
 
-	/* in */
-	case 0x09:
-	case 0x0A:
-		a=p[opcode&0x03];
-		++pc;
-		break;
-
 	/* inc */
 	case 0x18:
 	case 0x19:
@@ -281,15 +311,37 @@ switch(opcode)
 		pc=a==0 ? (pc&0xff00)+rom[pc+1] : pc+2;
 		break;
 
+	/* rl */
+	case 0xE7:
+		c=(a&0x80)?1:0;
+		a=(a<<1)|c;
+		++pc;
+		break;
+
+	/* rr */
+	case 0x77:
+		c=a&0x01;
+		a=(a>>1)|(c<<7);
+		++pc;
+		break;
+
 	/* rlc */
 	case 0xF7:
-		a<<=a;// TODO
+		{
+		char old_c=c;
+		c=(a&0x80)?1:0;
+		a=(a<<1)|old_c;
+		}
 		++pc;
 		break;
 
 	/* rrc */
 	case 0x67:
-		a>>=a;// TODO
+		{
+		char old_c=c;
+		c=a&0x01;
+		a=(a>>1)|(old_c<<7);
+		}
 		++pc;
 		break;
 
@@ -312,12 +364,19 @@ switch(opcode)
 		pc+=2;
 		break;
 
+	/* orl */
 	case 0x88:
 	case 0x89:
 	case 0x8A:
 	case 0x8B:
-//
+		p[opcode&0x03]|=rom[pc+1];
 		pc+=2;
+		break;
+
+	/* swap */
+	case 0x47:
+		a=(a<<4)|(a>>4);
+		++pc;
 		break;
 
 	/* outl */
@@ -336,6 +395,7 @@ switch(opcode)
 	/* anl */
 	case 0x98:
 	case 0x99:
+	case 0x9A:
 		p[opcode&0x03]&=rom[pc+1];
 		pc+=2;
 		break;
@@ -348,7 +408,6 @@ switch(opcode)
 	/* retr */
 	case 0x93:
 		pc=(iram[--sp]<<8)+iram[--sp];
-		psw=0;// TODO
 		break;
 
 	/* sel */
@@ -374,6 +433,21 @@ switch(opcode)
 	/* ent0 */
 	case 0x75:
 		t=1;
+		++pc;
+		break;
+
+	/* strt t */
+	case 0x55:
+		++pc;
+		break;
+
+	/* strt cnt */
+	case 0x45:
+		++pc;
+		break;
+
+	/* stop tcnt */
+	case 0x65:
 		++pc;
 		break;
 	
