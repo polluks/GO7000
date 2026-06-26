@@ -85,7 +85,7 @@ switch(opcode)
 		pc=((opcode&0xf0)<<3)+rom[pc+1];
 		break;
 
-	/* jbn */
+	/* jb* */
 	case 0x12:
 	case 0x32:
 	case 0x52:
@@ -94,7 +94,7 @@ switch(opcode)
 	case 0xB2:
 	case 0xD2:
 	case 0xF2:
-		pc=a&opcode>>4 ? (pc&0xff00)+rom[pc+1] : pc+2;
+		pc=a&1<<(opcode>>5) ? (pc&0xff00)+rom[pc+1] : pc+2;
 		break;
 
 	/* jc */
