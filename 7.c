@@ -42,33 +42,28 @@ switch(opcode)
 	case 0x6E:
 	case 0x6F:
 		a+=iram[opcode&0x07];
-		++pc;
-		break;
+		goto inc1;
 
 	/* add */
 	case 0x03:
 		a+=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* outl bus,a */
 	case 0x02:
 		p[0]=a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* ins a,bus */
 	case 0x08:
 		a=p[0];
-		++pc;
-		break;
+		goto inc1;
 
 	/* ins a,p */
 	case 0x09:
 	case 0x0A:
 		a=p[opcode&0x03];
-		++pc;
-		break;
+		goto inc1;
 
 	/* jmp */
 	case 0x04:
@@ -112,69 +107,58 @@ switch(opcode)
 	/* mov */
 	case 0x23:
 		a=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* clr */
 	case 0x27:
 		a=0;
-		++pc;
-		break;
+		goto inc1;
 
 	/* clr */
 	case 0x97:
 		c=0;
-		++pc;
-		break;
+		goto inc1;
 
 	/* clr */
 	case 0x85:
 		f0=0;
-		++pc;
-		break;
+		goto inc1;
 
 	/* clr */
 	case 0xA5:
 		f1=0;
-		++pc;
-		break;
+		goto inc1;
 
 	/* cpl */
 	case 0x37:
 		a=~a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* cpl c */
 	case 0xA7:
 		c=!c;
-		++pc;
-		break;
+		goto inc1;
 
 	/* cpl f0 */
 	case 0x95:
 		f0=!f0;
-		++pc;
-		break;
+		goto inc1;
 
 	/* cpl f1 */
 	case 0xB5:
 		f1=!f1;
-		++pc;
-		break;
+		goto inc1;
 
 	/* mov */
 	case 0xA0:
 	case 0xA1:
 		iram[iram[opcode&0x01]]=a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* movp */
 	case 0xA3:
 		a=rom[pc&0x00|a];
-		++pc;
-		break;
+		goto inc1;
 
 	/* mov */
 	case 0xA8:
@@ -186,8 +170,7 @@ switch(opcode)
 	case 0xAE:
 	case 0xAF:
 		iram[opcode&0x07]=a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* mov */
 	case 0xB8:
@@ -199,15 +182,13 @@ switch(opcode)
 	case 0xBE:
 	case 0xBF:
 		iram[opcode&0x07]=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* mov */
 	case 0xF0:
 	case 0xF1:
 		a=xram[iram[opcode&0x07]];
-		++pc;
-		break;
+		goto inc1;
 
 	/* mov */
 	case 0xF8:
@@ -219,22 +200,19 @@ switch(opcode)
 	case 0xFE:
 	case 0xFF:
 		a=iram[opcode&0x07];
-		++pc;
-		break;
+		goto inc1;
 
 	/* movx */
 	case 0x80:
 	case 0x81:
 		a=xram[opcode&1];
-		++pc;
-		break;
+		goto inc1;
 
 	/* movx */
 	case 0x90:
 	case 0x91:
 		xram[opcode&1]=a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* call */
 	case 0x14:
@@ -260,14 +238,12 @@ switch(opcode)
 	case 0x1E:
 	case 0x1F:
 		++iram[opcode&0x07];
-		++pc;
-		break;
+		goto inc1;
 
 	/* dec */
 	case 0x07:
 		--a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* dec */
 	case 0xC8:
@@ -279,8 +255,7 @@ switch(opcode)
 	case 0xCE:
 	case 0xCF:
 		--iram[opcode&0x07];
-		++pc;
-		break;
+		goto inc1;
 
 	/* djnz */
 	case 0xE8:
@@ -298,8 +273,7 @@ switch(opcode)
 	/* inc */
 	case 0x17:
 		++a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* jnz */
 	case 0x96:
@@ -315,15 +289,13 @@ switch(opcode)
 	case 0xE7:
 		c=(a&0x80)?1:0;
 		a=(a<<1)|c;
-		++pc;
-		break;
+		goto inc1;
 
 	/* rr */
 	case 0x77:
 		c=a&0x01;
 		a=(a>>1)|(c<<7);
-		++pc;
-		break;
+		goto inc1;
 
 	/* rlc */
 	case 0xF7:
@@ -332,8 +304,7 @@ switch(opcode)
 		c=(a&0x80)?1:0;
 		a=(a<<1)|old_c;
 		}
-		++pc;
-		break;
+		goto inc1;
 
 	/* rrc */
 	case 0x67:
@@ -342,8 +313,7 @@ switch(opcode)
 		c=a&0x01;
 		a=(a>>1)|(old_c<<7);
 		}
-		++pc;
-		break;
+		goto inc1;
 
 	/* orl */
 	case 0x48:
@@ -355,14 +325,12 @@ switch(opcode)
 	case 0x4E:
 	case 0x4F:
 		a|=iram[opcode&0x07];
-		++pc;
-		break;
+		goto inc1;
 
 	/* orl */
 	case 0x43:
 		a|=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* orl */
 	case 0x88:
@@ -370,35 +338,30 @@ switch(opcode)
 	case 0x8A:
 	case 0x8B:
 		p[opcode&0x03]|=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* swap */
 	case 0x47:
 		a=(a<<4)|(a>>4);
-		++pc;
-		break;
+		goto inc1;
 
 	/* outl */
 	case 0x39:
 	case 0x3A:
 		p[opcode&0x03]=a;
-		++pc;
-		break;
+		goto inc1;
 
 	/* anl */
 	case 0x53:
 		a&=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* anl */
 	case 0x98:
 	case 0x99:
 	case 0x9A:
 		p[opcode&0x03]&=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* ret */
 	case 0x83:
@@ -415,41 +378,34 @@ switch(opcode)
 	case 0xD5:
 	/* nop */
 	case 0x00:
-		++pc;
-		break;
+		goto inc1;
 
 	/* dis */
 	case 0x15:
 		i=0;
-		++pc;
-		break;
+		goto inc1;
 
 	/* en */
 	case 0x05:
 		i=1;
-		++pc;
-		break;
+		goto inc1;
 	
 	/* ent0 */
 	case 0x75:
 		t=1;
-		++pc;
-		break;
+		goto inc1;
 
 	/* strt t */
 	case 0x55:
-		++pc;
-		break;
+		goto inc1;
 
 	/* strt cnt */
 	case 0x45:
-		++pc;
-		break;
+		goto inc1;
 
 	/* stop tcnt */
 	case 0x65:
-		++pc;
-		break;
+		goto inc1;
 	
 	/* xch */
 	case 0x28:
@@ -461,21 +417,18 @@ switch(opcode)
 	case 0x2E:
 	case 0x2F:
 		XORSWAP_UNSAFE(a, iram[opcode&0x07]);
-		++pc;
-		break;
+		goto inc1;
 
 	/* xrl */
 	case 0xD0:
 	case 0xD1:
 		a^=iram[opcode&0x01];
-		++pc;
-		break;
+		goto inc1;
 
 	/* xrl */
 	case 0xD3:
 		a^=rom[pc+1];
-		pc+=2;
-		break;
+		goto inc2;
 
 	/* xrl */
 	case 0xD8:
@@ -487,12 +440,13 @@ switch(opcode)
 	case 0xDE:
 	case 0xDF:
 		a^=iram[opcode&0x07];
-		++pc;
-		break;
+		goto inc1;
 
 	default:
 		abort();
 	}
+inc1:	++pc; return;
+inc2:	pc+=2; return;
 }
 
 void main(int argc, char *argv[])
