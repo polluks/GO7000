@@ -21,6 +21,7 @@ char c;
 char ac;
 char f0;
 char f1;
+char bs;
 char i;
 char t;
 char p[3];
@@ -41,12 +42,19 @@ switch(opcode)
 	case 0x6D:
 	case 0x6E:
 	case 0x6F:
-		a+=iram[opcode&0x07];
+		{
+		char v=iram[opcode&0x07];
+		unsigned t=(unsigned char)a+(unsigned char)v;
+		c=t>>8; ac=((a&15)+(v&15))>>4; a=t;
+		}
 		goto inc1;
 
 	/* add */
 	case 0x03:
-		a+=rom[pc+1];
+		{
+		unsigned t=(unsigned char)a+(unsigned char)rom[pc+1];
+		c=t>>8; ac=((a&15)+(rom[pc+1]&15))>>4; a=t;
+		}
 		goto inc2;
 
 	/* outl bus,a */
@@ -373,11 +381,22 @@ switch(opcode)
 		pc=(iram[--sp]<<8)+iram[--sp];
 		break;
 
-	/* sel */
-	case 0xC5:
-	case 0xD5:
 	/* nop */
 	case 0x00:
+		goto inc1;
+
+	/* sel mb */
+	case 0xC5:
+	case 0xD5:
+		goto inc1;
+
+	/* sel rb */
+	case 0xE5:
+		bs=0;
+		goto inc1;
+
+	case 0xF5:
+		bs=1;
 		goto inc1;
 
 	/* dis */
@@ -462,5 +481,6 @@ for (i=0; i<max; ++i)
 	f1=i%INT_FRQ;
 	printf("%2x %3x %2d r0=%x r1=%x\n", opcode, pc, sp, iram[0], iram[1]);
 	decode();
+	psw=(c<<7)|(ac<<6)|(f0<<5)|(bs<<4)|0x08|((sp-8)>>1);
 	}
 }
