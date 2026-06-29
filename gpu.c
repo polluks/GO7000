@@ -69,8 +69,66 @@ char cset[512]= {
 0x00,0x00,0x00,0x06,0x6E,0xFF,0x7E,0x00};
 
 short *csetram=(short *)0x3800;
+char sram[32];
+char spr_y[4], spr_x[4], spr_attr[4];
 
 #include <stdio.h>
+
+void spr_init()
+{
+char i;
+for (i=0; i<32; ++i)
+	sram[i]=0;
+for (i=0; i<4; ++i)
+	spr_y[i]=spr_x[i]=spr_attr[i]=0;
+}
+
+void spr_load(const char vdc[256])
+{
+char i;
+static const char m[4]={12,8,4,0};
+for (i=0; i<4; ++i)
+	{
+	spr_y[i]=vdc[m[i]];
+	spr_x[i]=vdc[m[i]+1];
+	spr_attr[i]=vdc[m[i]+2];
+	}
+for (i=0; i<8; ++i)
+	{
+	sram[i]=vdc[0x98+i];
+	sram[8+i]=vdc[0x90+i];
+	sram[16+i]=vdc[0x88+i];
+	sram[24+i]=vdc[0x80+i];
+	}
+}
+
+char vdc[256];
+
+void vdc_init()
+{
+short i;
+for (i=0; i<256; ++i)
+	vdc[i]=0;
+spr_init();
+}
+
+char vdc_read(char addr)
+{
+return vdc[addr];
+}
+
+void vdc_write(char addr, char val)
+{
+vdc[addr]=val;
+if (addr==0x00||addr==0x04||addr==0x08||addr==0x0C)
+	spr_y[(12-addr)/4]=val;
+else if (addr==0x01||addr==0x05||addr==0x09||addr==0x0D)
+	spr_x[(12-addr)/4]=val;
+else if (addr==0x02||addr==0x06||addr==0x0A||addr==0x0E)
+	spr_attr[(12-addr)/4]=val;
+else if (addr>=0x80&&addr<=0x9F)
+	sram[addr-0x80]=val;
+}
 
 void double_width()
 {

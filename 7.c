@@ -195,7 +195,7 @@ switch(opcode)
 	/* mov */
 	case 0xF0:
 	case 0xF1:
-		a=xram[iram[opcode&0x07]];
+		a=iram[iram[opcode&0x07]];
 		goto inc1;
 
 	/* mov */
@@ -213,13 +213,22 @@ switch(opcode)
 	/* movx */
 	case 0x80:
 	case 0x81:
-		a=xram[opcode&1];
+		{
+		char ad=iram[opcode&0x07];
+		a=p[1]&0x08 ? xram[ad] : vdc_read(ad);
+		}
 		goto inc1;
 
 	/* movx */
 	case 0x90:
 	case 0x91:
-		xram[opcode&1]=a;
+		{
+		char ad=iram[opcode&0x07];
+		if (p[1]&0x08)
+			xram[ad]=a;
+		else
+			vdc_write(ad, a);
+		}
 		goto inc1;
 
 	/* call */
@@ -475,6 +484,7 @@ short i, max=2000;
 if (argc==2)
 	max=atoi(argv[1]);
 double_width();
+vdc_init();
 for (i=0; i<max; ++i)
 	{
 	opcode=rom[pc];
