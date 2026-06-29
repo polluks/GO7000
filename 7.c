@@ -25,6 +25,7 @@ char f1;
 char bs;
 char i;
 char t;
+char irq;
 char p[3];
 char psw;
 
@@ -392,7 +393,10 @@ switch(opcode)
 
 	/* retr */
 	case 0x93:
+		psw=iram[--sp];
+		c=psw>>7; ac=(psw>>6)&1; f0=(psw>>5)&1; bs=(psw>>4)&1;
 		pc=(iram[--sp]<<8)+iram[--sp];
+		i=1;
 		break;
 
 	/* nop */
@@ -498,5 +502,15 @@ for (i=0; i<max; ++i)
 	printf("%2x %3x %2d r0=%x r1=%x\n", opcode, pc, sp, iram[0], iram[1]);
 	decode();
 	psw=(c<<7)|(ac<<6)|(f0<<5)|(bs<<4)|0x08|((sp-8)>>1);
+	if (f1 && i) irq=1;
+	if (irq)
+		{
+		irq=0;
+		iram[sp++]=psw;
+		iram[sp++]=pc;
+		iram[sp++]=pc>>8;
+		pc=0x03;
+		i=0;
+		}
 	}
 }
