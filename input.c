@@ -1,6 +1,10 @@
 #include <_6526.h>
 
+#ifdef __C64__
+#define cia (*(volatile struct __6526*)0xDC00)
+#else
 struct __6526 cia;
+#endif
 char keyb[6];
 char rstflg;
 
@@ -110,6 +114,21 @@ switch (c)
 if (row != 0xFF)
 	input_set_key(row, col, pressed);
 }
+
+#ifdef __C64__
+void input_scan(void)
+{
+	char row;
+	cia.ddra = 0xFF;
+	cia.ddrb = 0x00;
+	for (row = 0; row < 6; row++) {
+		cia.pra = ~(1 << row);
+		keyb[row] = cia.prb;
+	}
+	cia.ddra = 0x00;
+	cia.pra = 0xFF;
+}
+#endif
 
 char input_read_p2(char p1, char p2)
 {

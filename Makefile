@@ -1,19 +1,21 @@
 AS= ca65
 CC= cl65
 SIM= sim65
-CFLAGS= -tsim6502 -l/tmp/7.lst #-S -T -O
 
-7: 7.c bins.o gpu.o input.o
-	$(CC) $(CFLAGS) 7.c bins.o gpu.o input.o
+# sim65 target (testing/debug)
+sim65: 7
+7: 7.c bins.s gpu.c input.c display.c
+	$(CC) -tsim6502 -O -o $@ $^
 	ls -l $@
 
-gpu.o: gpu.c gpu.h
-
-input.o: input.c input.h
-
+# c64 target (real hardware)
+c64: 7.prg
+7.prg: 7.c bins.s gpu.c input.c display.c irq.s
+	$(CC) -t c64 -O -o $@ $^
+	ls -l $@
 
 check: 7
-	$(SIM) -c $? $M
+	$(SIM) -c $< $(M)
 
 dist:
 	tar czf /tmp/GO7000.tgz *

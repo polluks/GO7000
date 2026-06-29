@@ -4,10 +4,13 @@ void spr_load(const char *vdc);
 void vdc_init();
 char vdc_read(char addr);
 void vdc_write(char addr, char val);
+void vdc_render(void);
+void display_init(void);
 void *sid_addr();
 extern char vdc[256];
 extern char sram[32];
 extern char spr_y[4], spr_x[4], spr_attr[4];
+extern char cset[512];
 
 #define VIC_BLACK      0,0,0
 #define VIC_WHITE      255,255,255

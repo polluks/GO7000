@@ -5,12 +5,13 @@
 #include <_sid.h>
 #include <stdio.h>
 
+#ifdef __C64__
+#define sid (*(volatile struct __sid*)0xD400)
+void *sid_addr() { return (void*)0xD400; }
+#else
 static struct __sid sid;
-
-void *sid_addr()
-{
-return &sid;
-}
+void *sid_addr() { return &sid; }
+#endif
 
 char cset[512]= {
 0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,
@@ -78,7 +79,7 @@ char cset[512]= {
 0x00,0x00,0x00,0x10,0x38,0xFF,0x7E,0x00,
 0x00,0x00,0x00,0x06,0x6E,0xFF,0x7E,0x00};
 
-short *csetram=(short *)0x3800;
+static short csetram[512];
 char sram[32];
 char spr_y[4], spr_x[4], spr_attr[4];
 

@@ -487,6 +487,57 @@ inc1:	++pc; return;
 inc2:	pc+=2; return;
 }
 
+#ifdef __C64__
+
+void main()
+{
+short i;
+
+*(unsigned char*)0xFFFA=0x03; *(unsigned char*)0xFFFB=0x00;
+*(unsigned char*)0xFFFC=0x00; *(unsigned char*)0xFFFD=0x00;
+*(unsigned char*)0xFFFE=0x03; *(unsigned char*)0xFFFF=0x00;
+
+double_width();
+vdc_init();
+input_init();
+display_init();
+
+	for (;;)
+	{
+	input_scan();
+	for (i=0; i<20000; ++i)
+		{
+		opcode=rom[pc];
+		f1=i%INT_FRQ;
+		decode();
+		psw=(c<<7)|(ac<<6)|(f0<<5)|(bs<<4)|0x08|((sp-8)>>1);
+		if (f1 && i) irq=1;
+		if (rstflg)
+			{
+			rstflg=0;
+			iram[sp++]=psw;
+			iram[sp++]=pc;
+			iram[sp++]=pc>>8;
+			pc=*(unsigned char*)0xFFFA|(*(unsigned char*)0xFFFB<<8);
+			}
+		if (irq)
+			{
+			irq=0;
+			iram[sp++]=psw;
+			iram[sp++]=pc;
+			iram[sp++]=pc>>8;
+			pc=0x03;
+			i=0;
+			}
+		}
+	vdc_render();
+	while (!(*(volatile char*)0xD011 & 0x80));
+	while (*(volatile char*)0xD011 & 0x80);
+	}
+}
+
+#else /* sim65 */
+
 void main(int argc, char *argv[])
 {
 short i, max=2000;
@@ -527,3 +578,5 @@ input_init();
 		}
 	}
 }
+
+#endif
