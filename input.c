@@ -49,6 +49,62 @@ if (row < 6 && col < 8)
 	}
 }
 
+void input_char(char c, char pressed)
+{
+char row = 0xFF, col;
+switch (c)
+	{
+	case '0': row=0; col=0; break;
+	case '1': row=0; col=1; break;
+	case '2': row=0; col=2; break;
+	case '3': row=0; col=3; break;
+	case '4': row=0; col=4; break;
+	case '5': row=0; col=5; break;
+	case '6': row=0; col=6; break;
+	case '7': row=0; col=7; break;
+	case '8': row=1; col=0; break;
+	case '9': row=1; col=1; break;
+	case ' ': row=1; col=4; break;
+	case '?': row=1; col=5; break;
+	case 'l': case 'L': row=1; col=6; break;
+	case 'p': case 'P': row=1; col=7; break;
+	case '+': row=2; col=0; break;
+	case 'w': case 'W': row=2; col=1; break;
+	case 'e': case 'E': row=2; col=2; break;
+	case 'r': case 'R': row=2; col=3; break;
+	case 't': case 'T': row=2; col=4; break;
+	case 'u': case 'U': row=2; col=5; break;
+	case 'i': case 'I': row=2; col=6; break;
+	case 'o': case 'O': row=2; col=7; break;
+	case 'q': case 'Q': row=3; col=0; break;
+	case 's': case 'S': row=3; col=1; break;
+	case 'd': case 'D': row=3; col=2; break;
+	case 'f': case 'F': row=3; col=3; break;
+	case 'g': case 'G': row=3; col=4; break;
+	case 'h': case 'H': row=3; col=5; break;
+	case 'j': case 'J': row=3; col=6; break;
+	case 'k': case 'K': row=3; col=7; break;
+	case 'a': case 'A': row=4; col=0; break;
+	case 'z': case 'Z': row=4; col=1; break;
+	case 'x': case 'X': row=4; col=2; break;
+	case 'c': case 'C': row=4; col=3; break;
+	case 'v': case 'V': row=4; col=4; break;
+	case 'b': case 'B': row=4; col=5; break;
+	case 'm': case 'M': row=4; col=6; break;
+	case '.': row=4; col=7; break;
+	case '-': row=5; col=0; break;
+	case '*': row=5; col=1; break;
+	case '/': row=5; col=2; break;
+	case '=': row=5; col=3; break;
+	case 'y': case 'Y': row=5; col=4; break;
+	case 'n': case 'N': row=5; col=5; break;
+	case 127: row=5; col=6; break;
+	case '\n': case '\r': row=5; col=7; break;
+	}
+if (row != 0xFF)
+	input_set_key(row, col, pressed);
+}
+
 char input_read_p2(char p1, char p2)
 {
 if (!(p1 & 4))
