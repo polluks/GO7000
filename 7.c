@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "gpu.h"
+#include "input.h"
 #define XORSWAP_UNSAFE(a, b)    ((a)^=(b),(b)^=(a),(a)^=(b))
 #define INT_FRQ 32
 
@@ -64,7 +65,7 @@ switch(opcode)
 
 	/* ins a,bus */
 	case 0x08:
-		a=p[0];
+		a=input_bus(p[1], p[2]);
 		goto inc1;
 
 	/* ins a,p */

@@ -3,11 +3,13 @@ CC= cl65
 SIM= sim65
 CFLAGS= -tsim6502 -l/tmp/7.lst #-S -T -O
 
-7: 7.c bins.o gpu.o
-	$(CC) $(CFLAGS) 7.c bins.o gpu.o
+7: 7.c bins.o gpu.o input.o
+	$(CC) $(CFLAGS) 7.c bins.o gpu.o input.o
 	ls -l $@
 
 gpu.o: gpu.c gpu.h
+
+input.o: input.c input.h
 
 
 check: 7
