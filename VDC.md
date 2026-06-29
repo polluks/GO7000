@@ -60,7 +60,37 @@ After the character layer is drawn, composite the 4 sprites over it:
 
 ## Missing — colour
 
-Real i8244 colour registers (0x10-0x17) hold 8 palette entries of 4-bit foreground + 4-bit background. Map these to 24-bit RGB for PPM output. If no palette is written, default to an 8-colour CGA-like set.
+Real i8244 colour registers (0x10-0x17) hold up to 8 palette entries of 4-bit foreground + 4-bit background. Map these to 24-bit RGB for PPM output using the VIC-II palette (commonly accepted as the "VIC colours"):
+
+| Index | Colour      | R    G    B
+|-------|-------------|-----------------
+| 0     | Black       |  0    0    0
+| 1     | White       |255  255  255
+| 2     | Red         |136    0    0
+| 3     | Cyan        |170  255  238
+| 4     | Purple      |204   68  204
+| 5     | Green       |  0  204   85
+| 6     | Blue        |  0    0  170
+| 7     | Yellow      |238  238  119
+| 8     | Orange      |221  136   85
+| 9     | Brown       |102   68    0
+|10     | Pink        |255  119  119
+|11     | Dark Grey   | 51   51   51
+|12     | Grey        |119  119  119
+|13     | Light Green |170  255  102
+|14     | Light Blue  |  0  136  255
+|15     | Light Grey  |187  187  187
+
+If no palette is written, default to VIC colours 0 (black background) and 1 (white foreground).
+
+```c
+static const unsigned char vic_pal[16][3] = {
+    {  0,  0,  0}, {255,255,255}, {136,  0,  0}, {170,255,238},
+    {204, 68,204}, {  0,204, 85}, {  0,  0,170}, {238,238,119},
+    {221,136, 85}, {102, 68,  0}, {255,119,119}, { 51, 51, 51},
+    {119,119,119}, {170,255,102}, {  0,136,255}, {187,187,187},
+};
+```
 
 ## Missing — display control
 
