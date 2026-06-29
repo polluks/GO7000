@@ -491,6 +491,10 @@ void main(int argc, char *argv[])
 {
 short i, max=2000;
 
+*(unsigned char*)0xFFFA=0x03; *(unsigned char*)0xFFFB=0x00;
+*(unsigned char*)0xFFFC=0x00; *(unsigned char*)0xFFFD=0x00;
+*(unsigned char*)0xFFFE=0x03; *(unsigned char*)0xFFFF=0x00;
+
 if (argc==2)
 	max=atoi(argv[1]);
 double_width();
