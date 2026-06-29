@@ -29,6 +29,7 @@ char irq;
 char p[3];
 char psw;
 
+
 const char VER[]="$\x56\x45\x52: go7000 0.8 ("__DATE__") $";
 
 void decode()
@@ -509,7 +510,7 @@ for (i=0; i<max; ++i)
 		iram[sp++]=psw;
 		iram[sp++]=pc;
 		iram[sp++]=pc>>8;
-		pc=0x03;
+		pc=*(unsigned char*)0xFFFA|(*(unsigned char*)0xFFFB<<8);
 		}
 	if (irq)
 		{
