@@ -2,6 +2,7 @@
 
 struct __6526 cia;
 char keyb[6];
+char restore;
 
 void input_init()
 {
@@ -38,6 +39,11 @@ else
 	if (pressed) cia.prb &= ~(1 << bit);
 	else cia.prb |= (1 << bit);
 	}
+}
+
+void input_set_restore()
+{
+restore = 1;
 }
 
 void input_set_key(char row, char col, char pressed)

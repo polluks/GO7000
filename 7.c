@@ -512,5 +512,12 @@ for (i=0; i<max; ++i)
 		pc=0x03;
 		i=0;
 		}
+	if (restore)
+		{
+		restore=0;
+		pc=0; sp=0x08; a=0;
+		c=ac=f0=f1=bs=i=irq=0;
+		p[0]=p[1]=p[2]=0;
+		}
 	}
 }
