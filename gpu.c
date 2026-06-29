@@ -1,6 +1,16 @@
 /*
- *   i8244 character table
+ *   i8244 character table / VDC / SID sound
  */
+
+#include <_sid.h>
+#include <stdio.h>
+
+static struct __sid sid;
+
+void *sid_addr()
+{
+return &sid;
+}
 
 char cset[512]= {
 0x7C,0xC6,0xC6,0xC6,0xC6,0xC6,0x7C,0x00,
@@ -72,8 +82,6 @@ short *csetram=(short *)0x3800;
 char sram[32];
 char spr_y[4], spr_x[4], spr_attr[4];
 
-#include <stdio.h>
-
 void spr_init()
 {
 char i;
@@ -127,6 +135,14 @@ else if (addr==0x02||addr==0x06||addr==0x0A||addr==0x0E)
 	spr_attr[(12-addr)/4]=val;
 else if (addr>=0x80&&addr<=0x9F)
 	sram[addr-0x80]=val;
+else if (addr==0x40) ((char*)&sid.v1.freq)[0]=val;
+else if (addr==0x41) ((char*)&sid.v1.freq)[1]=val;
+else if (addr==0x42) sid.v1.ctrl=val;
+else if (addr==0x43) ((char*)&sid.v2.freq)[0]=val;
+else if (addr==0x44) ((char*)&sid.v2.freq)[1]=val;
+else if (addr==0x45) sid.v2.ctrl=val;
+else if (addr==0x46) ((char*)&sid.v3.freq)[0]=val;
+else if (addr==0x47) sid.v3.ctrl=val;
 }
 
 void double_width()

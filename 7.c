@@ -500,7 +500,7 @@ if (argc==2)
 double_width();
 vdc_init();
 input_init();
-for (i=0; i<max; ++i)
+	for (i=0; i<max; ++i)
 	{
 	opcode=rom[pc];
 	f1=i%INT_FRQ;
