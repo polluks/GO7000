@@ -106,9 +106,8 @@ char vdc[256];
 
 void vdc_init()
 {
-short i;
-for (i=0; i<256; ++i)
-	vdc[i]=0;
+char i=0;
+do vdc[i]=0; while (++i);
 spr_init();
 }
 
