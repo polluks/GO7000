@@ -503,6 +503,14 @@ for (i=0; i<max; ++i)
 	decode();
 	psw=(c<<7)|(ac<<6)|(f0<<5)|(bs<<4)|0x08|((sp-8)>>1);
 	if (f1 && i) irq=1;
+	if (rstflg)
+		{
+		rstflg=0;
+		iram[sp++]=psw;
+		iram[sp++]=pc;
+		iram[sp++]=pc>>8;
+		pc=0x03;
+		}
 	if (irq)
 		{
 		irq=0;
@@ -511,13 +519,6 @@ for (i=0; i<max; ++i)
 		iram[sp++]=pc>>8;
 		pc=0x03;
 		i=0;
-		}
-	if (restore)
-		{
-		restore=0;
-		pc=0; sp=0x08; a=0;
-		c=ac=f0=f1=bs=i=irq=0;
-		p[0]=p[1]=p[2]=0;
 		}
 	}
 }

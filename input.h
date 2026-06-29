@@ -3,8 +3,8 @@ char input_bus(char p1, char p2);
 void input_set(int n, char state);
 void input_set_bit(int n, int bit, int pressed);
 void input_set_key(char row, char col, char pressed);
-void input_set_restore();
-extern char restore;
+void input_set_nmi();
+extern char rstflg;
 void input_char(char c, char pressed);
 char input_read_p2(char p1, char p2);
 

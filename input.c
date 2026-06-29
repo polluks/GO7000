@@ -2,7 +2,7 @@
 
 struct __6526 cia;
 char keyb[6];
-char restore;
+char rstflg;
 
 void input_init()
 {
@@ -41,9 +41,9 @@ else
 	}
 }
 
-void input_set_restore()
+void input_set_nmi()
 {
-restore = 1;
+rstflg = 1;
 }
 
 void input_set_key(char row, char col, char pressed)
