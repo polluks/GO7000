@@ -68,10 +68,14 @@ switch(opcode)
 		a=input_bus(p[1], p[2]);
 		goto inc1;
 
-	/* ins a,p */
+	/* ins a,p1 */
 	case 0x09:
+		a=p[1];
+		goto inc1;
+
+	/* ins a,p2 */
 	case 0x0A:
-		a=p[opcode&0x03];
+		a=input_read_p2(p[1], p[2]);
 		goto inc1;
 
 	/* jmp */
@@ -486,6 +490,7 @@ if (argc==2)
 	max=atoi(argv[1]);
 double_width();
 vdc_init();
+input_init();
 for (i=0; i<max; ++i)
 	{
 	opcode=rom[pc];
